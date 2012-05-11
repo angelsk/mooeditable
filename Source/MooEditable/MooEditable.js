@@ -132,7 +132,6 @@ this.MooEditable = new Class({
 				height: dimensions.y
 			}
 		});
-		
 		this.toolbar = new MooEditable.UI.Toolbar({
 			onItemAction: function(){
 				var args = Array.from(arguments);
@@ -198,7 +197,7 @@ this.MooEditable = new Class({
 				});
 			});
 		});
-
+		
 		// contentWindow and document references
 		this.win = this.iframe.contentWindow;
 		this.doc = this.win.document;
@@ -216,7 +215,7 @@ this.MooEditable = new Class({
 		this.doc.open();
 		this.doc.write(docHTML);
 		this.doc.close();
-
+		
 		// Turn on Design Mode
 		// IE fired load event twice if designMode is set
 		(Browser.ie) ? this.doc.body.contentEditable = true : this.doc.designMode = 'On';
@@ -254,6 +253,7 @@ this.MooEditable = new Class({
 			focus: this.editorFocus.bind(this),
 			blur: this.editorBlur.bind(this)
 		});
+		
 		this.win.addEvents({
 			focus: this.editorFocus.bind(this),
 			blur: this.editorBlur.bind(this)
@@ -616,7 +616,10 @@ this.MooEditable = new Class({
 			protect.push(a);
 			return '<!-- mooeditable:protect:' + (protect.length-1) + ' -->';
 		});
-		this.doc.body.set('html', this.ensureRootElement(content));
+		
+	  this.doc.body.innerHTML = this.ensureRootElement(content);
+	  //this.doc.body.set('html', this.ensureRootElement(content)); // breaks in IE7 with mootools 1.4.5
+		
 		return this;
 	},
 
@@ -667,6 +670,7 @@ this.MooEditable = new Class({
 			}
 			val = el.get('html').replace(/\n\n/g, '');
 		}
+		
 		return val;
 	},
 
