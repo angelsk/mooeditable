@@ -60,7 +60,8 @@ this.MooEditable = new Class({
 		html: '<!DOCTYPE html><html><head><meta charset="UTF-8">{BASEHREF}<style>{BASECSS} {EXTRACSS}</style>{EXTERNALCSS}</head><body></body></html>',
 		rootElement: 'p',
 		baseURL: '',
-		dimensions: null
+		dimensions: null,
+		linksInNewWindow: false
 	},
 
 	initialize: function(el, options){
@@ -1511,16 +1512,26 @@ MooEditable.Actions = {
 		dialogs: {
 			alert: MooEditable.UI.AlertDialog.pass(MooEditable.Locale.get('selectTextHyperlink')),
 			prompt: function(editor){
-				return MooEditable.UI.PromptDialog(MooEditable.Locale.get('enterURL'), 'http://', function(url){
-					editor.execute('createlink', false, url.trim());
+				return MooEditable.UI.PromptDialog(MooEditable.Locale.get('enterURL') + ' (start with http:// for external URLs and / for internal URLs)', '', function(url){
+				  var url = url.trim();
+				  editor.execute('createlink', false, url);
+				  
+				  if (editor.options.linksInNewWindow) {
+  				  if (url && (url.contains('http://') || url.contains('https://'))) {
+  				    var node = editor.selection.getNode();
+  				    node.set('target', '_blank');
+  				    this.saveContent();
+  				  }
+				  }
 				});
 			}
 		},
 		command: function(){
 			var selection = this.selection;
 			var dialogs = this.dialogs.createlink;
-			if (selection.isCollapsed()){
-				var node = selection.getNode();
+			var node = selection.getNode();
+			
+			if (node.get('tag') == 'a' || selection.isCollapsed()){
 				if (node.get('tag') == 'a' && node.get('href')){
 					selection.selectNode(node);
 					var prompt = dialogs.prompt;
